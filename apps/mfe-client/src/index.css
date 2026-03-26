@@ -1,0 +1,26 @@
+.air-device-host {
+  display: block;
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 1.5rem;
+  border: 2px dashed #4f46e5;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  color: #1e293b;
+  text-align: center;
+  max-width: 320px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.standby-text {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}

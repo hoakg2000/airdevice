@@ -1,0 +1,12 @@
+{
+  "name": "air-device-monorepo",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev:infra": "docker-compose -f docker/docker-compose.yml up -d",
+    "clean": "pnpm -r exec rm -rf node_modules dist .turbo"
+  }
+}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Host App - Test MFE</title>
+  <style>
+    /* CSS này của Host Web sẽ KHÔNG THỂ làm hỏng CSS bên trong AirDevice */
+    body { background-color: #111; color: white; padding: 2rem; }
+    h1 { color: red; } 
+  </style>
+</head>
+<body>
+  <h1>Desktop Banking Portal (Host)</h1>
+  <p>Please scan the QR code to upload your ID card.</p>
+
+  <air-device></air-device>
+
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

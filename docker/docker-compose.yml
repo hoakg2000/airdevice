@@ -1,0 +1,25 @@
+# docker/docker-compose.yml
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: air-device-redis
+    # Nạp file cấu hình custom của chúng ta
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - air-device-net
+    # Đảm bảo NestJS chỉ khởi động khi Redis đã sẵn sàng (Healthcheck)
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  air-device-net:
+    driver: bridge
