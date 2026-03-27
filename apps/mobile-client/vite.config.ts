@@ -5,7 +5,7 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 export default defineConfig({
   plugins: [
     react(),
-    basicSsl() // Tự động tạo chứng chỉ https cho dev server
+    basicSsl(), // Tự động tạo chứng chỉ https cho dev server
   ],
   server: {
     host: true, // Lắng nghe trên 0.0.0.0 (để điện thoại trong cùng WiFi có thể truy cập)
@@ -16,7 +16,7 @@ export default defineConfig({
       '/socket.io': {
         target: 'http://192.168.1.4:3000', // Đẩy ngầm về NestJS
         ws: true,
-      }
-    }
-  }
+      },
+    },
+  },
 });

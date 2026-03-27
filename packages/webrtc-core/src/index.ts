@@ -61,8 +61,7 @@ export class AirDevicePeer {
     try {
       // Logic chống SDP Glare (Va chạm Offer)
       const offerCollision =
-        description.type === 'offer' &&
-        (this.makingOffer || this.pc.signalingState !== 'stable');
+        description.type === 'offer' && (this.makingOffer || this.pc.signalingState !== 'stable');
 
       this.ignoreOffer = !this.isPolite && offerCollision;
       if (this.ignoreOffer) return; // Impolite peer sẽ lờ đi offer của Polite peer
@@ -85,7 +84,7 @@ export class AirDevicePeer {
   public async handleRemoteIce(candidate: RTCIceCandidateInit) {
     try {
       // Phải bắt lỗi vì ICE có thể tới trước khi setRemoteDescription xong (đặc thù của Trickle ICE)
-      await this.pc.addIceCandidate(candidate).catch(e => {
+      await this.pc.addIceCandidate(candidate).catch((e) => {
         if (!this.ignoreOffer) console.warn('Lỗi add ICE candidate:', e);
       });
     } catch (err) {
@@ -102,7 +101,6 @@ export class AirDevicePeer {
 
       const sender = this.pc.addTrack(track, stream);
 
-
       // Chỉ can thiệp vào luồng Video
       if (track.kind === 'video') {
         const parameters = sender.getParameters();
@@ -115,13 +113,13 @@ export class AirDevicePeer {
         parameters.encodings[0].maxBitrate = 1500000;
 
         // 2. Tắt tính năng tự động hạ độ phân giải (Scale down)
-        // Lưu ý: Có thể báo lỗi đỏ ở TypeScript vì thuộc tính này khá mới, 
+        // Lưu ý: Có thể báo lỗi đỏ ở TypeScript vì thuộc tính này khá mới,
         // bạn có thể phớt lờ lỗi type hoặc dùng @ts-ignore
         // @ts-ignore
         parameters.degradationPreference = 'maintain-resolution';
 
         // Áp dụng thông số mới
-        sender.setParameters(parameters).catch(e => {
+        sender.setParameters(parameters).catch((e) => {
           console.warn('Trình duyệt không hỗ trợ ép parameters:', e);
         });
       }

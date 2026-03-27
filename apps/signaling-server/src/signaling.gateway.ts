@@ -20,10 +20,7 @@ export class SignalingGateway {
   server!: Server<ClientEvents, ServerEvents>;
 
   @SubscribeMessage('message')
-  handleMessage(
-    @MessageBody() rawData: any,
-    @ConnectedSocket() client: Socket,
-  ) {
+  handleMessage(@MessageBody() rawData: any, @ConnectedSocket() client: Socket) {
     const parsed = WsMessageSchema.safeParse(rawData);
     if (!parsed.success) {
       client.emit('exception', { status: 'error', message: 'Invalid payload' });
@@ -34,7 +31,7 @@ export class SignalingGateway {
 
     switch (message.type) {
       case 'SESSION_INIT': {
-        const sessionId = "123";
+        const sessionId = '123';
         // Desktop join vào Room mang tên là sessionId
         client.join(sessionId);
         client.emit('session_created', { sessionId });
@@ -67,7 +64,7 @@ export class SignalingGateway {
         const rooms = Array.from(client.rooms);
         const sessionRoom = rooms.find((r) => r !== client.id);
         if (sessionRoom) {
-           // Bắn thẳng ICE Candidate cho người bên kia
+          // Bắn thẳng ICE Candidate cho người bên kia
           client.to(sessionRoom).emit('webrtc_ice_received', message.payload);
         }
         break;

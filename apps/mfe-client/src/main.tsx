@@ -11,8 +11,8 @@ class AirDeviceElement extends HTMLElement {
 
     // 1. Gắn Shadow DOM ở mode 'open' (để React có thể thao tác events bên trong)
     const shadow = this.attachShadow({ mode: 'open' });
-    
-    // 2. Bơm CSS cục bộ vào Shadow Root. 
+
+    // 2. Bơm CSS cục bộ vào Shadow Root.
     // Tuyệt đối không ảnh hưởng đến Host Web, và Host Web cũng không chạm được vào đây.
     const styleTag = document.createElement('style');
     styleTag.textContent = styles;
@@ -26,7 +26,7 @@ class AirDeviceElement extends HTMLElement {
     const root = createRoot(mountPoint);
     root.render(
       // <React.StrictMode>
-        <App />
+      <App />,
       // </React.StrictMode>
     );
   }

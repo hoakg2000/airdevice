@@ -26,11 +26,13 @@ export const SdpPayloadSchema = z.object({
 });
 
 // 2. Schema cho WebRTC ICE Candidate
-export const IcePayloadSchema = z.object({
-  candidate: z.string(),
-  sdpMid: z.string().nullish(),       // Đổi nullable() thành nullish()
-  sdpMLineIndex: z.number().nullish(),// Đổi nullable() thành nullish()
-}).passthrough();
+export const IcePayloadSchema = z
+  .object({
+    candidate: z.string(),
+    sdpMid: z.string().nullish(), // Đổi nullable() thành nullish()
+    sdpMLineIndex: z.number().nullish(), // Đổi nullable() thành nullish()
+  })
+  .passthrough();
 
 // 3. WSS Router Contract (Bọc lại thành 1 Union duy nhất)
 // Pattern này giúp làm Router trên backend cực kỳ type-safe
@@ -43,7 +45,6 @@ export const WsMessageSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('WEBRTC_ICE'), payload: IcePayloadSchema }),
   z.object({ type: z.literal('DEVICE_COMMAND'), payload: DeviceCommandPayloadSchema }),
 ]);
-
 
 // --- TYPES EXPORT ---
 export type WsMessage = z.infer<typeof WsMessageSchema>;

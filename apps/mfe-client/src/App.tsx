@@ -10,10 +10,10 @@ export const App: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [peerConnected, setPeerConnected] = useState(false);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
-  
+
   // State hiệu ứng chớp camera
   const [isFlashing, setIsFlashing] = useState(false);
-  
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -31,14 +31,16 @@ export const App: React.FC = () => {
     socket.on('session_created', (data) => setSessionId(data.sessionId));
     socket.on('peer_connected', () => setPeerConnected(true));
 
-    peer.onLocalSdpReady = (sdp) => socket.emit('message', { type: 'WEBRTC_SDP', payload: sdp as any });
-    peer.onLocalIceReady = (ice) => socket.emit('message', { type: 'WEBRTC_ICE', payload: ice as any });
+    peer.onLocalSdpReady = (sdp) =>
+      socket.emit('message', { type: 'WEBRTC_SDP', payload: sdp as any });
+    peer.onLocalIceReady = (ice) =>
+      socket.emit('message', { type: 'WEBRTC_ICE', payload: ice as any });
 
     socket.on('webrtc_sdp_received', (sdp) => peer.handleRemoteSdp(sdp));
     socket.on('webrtc_ice_received', (ice) => peer.handleRemoteIce(ice));
 
     peer.onTrackReceived = (track, streams) => {
-      const stream = (streams && streams.length > 0) ? streams[0] : new MediaStream([track]);
+      const stream = streams && streams.length > 0 ? streams[0] : new MediaStream([track]);
       setRemoteStream(stream);
     };
 
@@ -60,7 +62,7 @@ export const App: React.FC = () => {
     if (videoRef.current && remoteStream) {
       videoRef.current.srcObject = remoteStream;
       videoRef.current.onloadedmetadata = () => {
-        videoRef.current?.play().catch(e => console.warn("Auto-play error:", e));
+        videoRef.current?.play().catch((e) => console.warn('Auto-play error:', e));
       };
     }
   }, [remoteStream, peerConnected]);
@@ -79,15 +81,15 @@ export const App: React.FC = () => {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext('2d');
-    
+
     if (ctx) {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const base64Image = canvas.toDataURL('image/jpeg', 0.9);
-      
+
       const captureEvent = new CustomEvent('air-device-frame-captured', {
         detail: { imageBase64: base64Image },
         bubbles: true,
-        composed: true
+        composed: true,
       });
       window.dispatchEvent(captureEvent);
     }
@@ -103,14 +105,14 @@ export const App: React.FC = () => {
         <div>
           {/* Header Generic */}
           <h3 style={{ color: '#111827', marginBottom: '8px', marginTop: 0 }}>
-             AirDevice - Remote Camera
+            AirDevice - Remote Camera
           </h3>
           <p style={{ color: '#6b7280', fontSize: '0.9rem', margin: 0 }}>
-             🟢 Kết nối thành công. Vui lòng căn chỉnh khung hình trên thiết bị di động.
+            🟢 Kết nối thành công. Vui lòng căn chỉnh khung hình trên thiết bị di động.
           </p>
-          
+
           <div className="video-container">
-             {/* Lớp phủ nháy Flash */}
+            {/* Lớp phủ nháy Flash */}
             <div className={`flash-effect ${isFlashing ? 'active' : ''}`}></div>
             <video ref={videoRef} className="remote-video" autoPlay playsInline muted />
           </div>
@@ -132,13 +134,21 @@ export const App: React.FC = () => {
             <div className="qr-steps">
               <h4>Hướng dẫn thao tác:</h4>
               <ol>
-                <li>Mở ứng dụng <b>Camera</b> trên điện thoại.</li>
-                <li><b>Quét mã QR</b> bên cạnh để nhận liên kết.</li>
-                <li>Nhấn <b>Cho phép truy cập Camera</b> trên trình duyệt điện thoại.</li>
+                <li>
+                  Mở ứng dụng <b>Camera</b> trên điện thoại.
+                </li>
+                <li>
+                  <b>Quét mã QR</b> bên cạnh để nhận liên kết.
+                </li>
+                <li>
+                  Nhấn <b>Cho phép truy cập Camera</b> trên trình duyệt điện thoại.
+                </li>
               </ol>
             </div>
           </div>
-          <p style={{ fontSize: '0.8rem', marginTop: '15px', color: '#9ca3af', textAlign: 'center' }}>
+          <p
+            style={{ fontSize: '0.8rem', marginTop: '15px', color: '#9ca3af', textAlign: 'center' }}
+          >
             Mã phiên kết nối: {sessionId.split('-')[0]}...
           </p>
         </div>

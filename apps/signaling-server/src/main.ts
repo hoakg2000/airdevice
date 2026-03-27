@@ -5,10 +5,7 @@ import { RedisIoAdapter } from './redis-io.adapter';
 
 async function bootstrap() {
   // Sử dụng Fastify thay vì Express mặc định
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter()
-  );
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
   // Gắn Redis Adapter vào Lifecycle của NestJS
   const redisIoAdapter = new RedisIoAdapter(app);
