@@ -1,25 +1,33 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
+// Sửa lại thành arrow function để nhận biến 'mode'
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
+  
+  // Các cấu hình build xịn xò của bạn giữ nguyên
   build: {
     target: 'esnext',
-    // Tắt hoàn toàn việc băm tên file (hashing), luôn xuất ra 1 tên cố định
     rollupOptions: {
       input: 'src/main.tsx',
       output: {
         format: 'iife',
         entryFileNames: 'air-device.js',
-        name: 'AirDeviceMFE', // Global variable cho script
+        name: 'AirDeviceMFE',
       },
     },
-    // Không tách file CSS, chuẩn bị cho việc inject thẳng vào Shadow DOM
     cssCodeSplit: false,
-    // Ép mọi asset (SVG, PNG) nhỏ hơn 100MB thành Base64 nhúng thẳng vào JS
     assetsInlineLimit: 100000000,
   },
+  
+  // FIX Ở ĐÂY: Chỉ ép production khi KHÔNG phải là chế độ test
   define: {
-    'process.env.NODE_ENV': '"production"',
+    'process.env.NODE_ENV': mode === 'test' ? '"development"' : '"production"',
   },
-});
+  
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.ts',
+  },
+}));
