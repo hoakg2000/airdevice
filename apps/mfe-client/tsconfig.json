@@ -1,0 +1,8 @@
+{
+  "extends": "../../packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vitest/globals", "@testing-library/jest-dom", "vite/client"],
+    "jsx": "react-jsx" 
+  },
+  "include": ["src", "vite-env.d.ts"]
+}
