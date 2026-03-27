@@ -1,14 +1,46 @@
 .air-device-host {
-  display: block;
   font-family: system-ui, -apple-system, sans-serif;
-  padding: 1.5rem;
-  border: 2px dashed #4f46e5;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
-  background-color: #f8fafc;
-  color: #1e293b;
-  text-align: center;
-  max-width: 320px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  padding: 24px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.qr-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+}
+
+.qr-steps {
+  flex: 1;
+}
+
+.qr-steps h4 {
+  margin-top: 0;
+  color: #111827;
+  font-size: 1.1rem;
+}
+
+.qr-steps ol {
+  padding-left: 20px;
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.qr-box {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .standby-text {
@@ -23,4 +55,65 @@
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: .5; }
+}
+
+.video-container {
+  width: 100%;
+  /* Tăng chiều cao để có không gian chứa video tỷ lệ 16:9 của mobile */
+  height: 350px; 
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #000;
+  margin-top: 16px;
+  position: relative;
+}
+.remote-video {
+  width: 100%;
+  height: 100%;
+  /* QUAN TRỌNG: Đổi sang contain để không mất góc CMND */
+  object-fit: contain; 
+  display: block;
+}
+
+/* Hiệu ứng chớp nháy trắng khi chụp ảnh */
+.flash-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.flash-effect.active {
+  animation: flashAnim 0.3s ease-out;
+}
+
+@keyframes flashAnim {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.capture-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.capture-btn:hover {
+  background-color: #4338ca;
+}
+
+.capture-btn:active {
+  transform: scale(0.98);
 }

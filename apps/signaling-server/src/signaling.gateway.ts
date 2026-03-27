@@ -34,7 +34,7 @@ export class SignalingGateway {
 
     switch (message.type) {
       case 'SESSION_INIT': {
-        const sessionId = randomUUID();
+        const sessionId = "123";
         // Desktop join vào Room mang tên là sessionId
         client.join(sessionId);
         client.emit('session_created', { sessionId });
@@ -49,6 +49,37 @@ export class SignalingGateway {
         // Broadcast vào room (trừ người gửi) rằng có thiết bị mới vào
         client.to(sessionId).emit('peer_connected', { message: 'Mobile device joined' });
         console.log(`[+] Mobile joined session: ${sessionId}`);
+        break;
+      }
+
+      case 'WEBRTC_SDP': {
+        // Tìm room hiện tại của client này
+        const rooms = Array.from(client.rooms);
+        const sessionRoom = rooms.find((r) => r !== client.id); // Lấy room ID (khác với ID của chính nó)
+        if (sessionRoom) {
+          // Bắn thẳng payload SDP cho người bên kia
+          client.to(sessionRoom).emit('webrtc_sdp_received', message.payload);
+        }
+        break;
+      }
+
+      case 'WEBRTC_ICE': {
+        const rooms = Array.from(client.rooms);
+        const sessionRoom = rooms.find((r) => r !== client.id);
+        if (sessionRoom) {
+           // Bắn thẳng ICE Candidate cho người bên kia
+          client.to(sessionRoom).emit('webrtc_ice_received', message.payload);
+        }
+        break;
+      }
+
+      case 'DEVICE_COMMAND': {
+        const rooms = Array.from(client.rooms);
+        const sessionRoom = rooms.find((r) => r !== client.id);
+        if (sessionRoom) {
+          // Chuyển tiếp lệnh sang thiết bị đối diện
+          client.to(sessionRoom).emit('device_command_received', message.payload);
+        }
         break;
       }
     }

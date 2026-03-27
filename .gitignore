@@ -1,5 +1,5 @@
 # Custom exclusions for airdevice
-docs/
+# docs/
 .aiconfig.md
 aiexclude.md
 node_modules/

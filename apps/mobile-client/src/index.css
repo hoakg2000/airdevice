@@ -35,3 +35,91 @@ body {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
 }
+
+.local-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover; /* Cắt cúp video để lấp đầy màn hình, không bị méo */
+  z-index: -1; /* Đẩy video xuống dưới cùng làm nền */
+  background-color: #111;
+}
+
+.overlay {
+  /* ... Giữ nguyên ... */
+  background: rgba(0, 0, 0, 0.7); /* Làm nền mờ tối hơn chút để dễ đọc chữ trên nền video */
+  backdrop-filter: blur(8px);
+}
+
+.camera-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 120px;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+/* Nút chụp ảnh siêu to khổng lồ */
+.capture-btn-mobile {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 4px solid white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+/* Hiệu ứng khi bấm (Haptic feedback visual) */
+.capture-btn-mobile:active {
+  transform: scale(0.9);
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.capture-btn-mobile .inner-circle {
+  width: 54px;
+  height: 54px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+/* Xử lý Layout khi Xoay Ngang (Landscape) */
+@media screen and (orientation: landscape) {
+  .camera-controls {
+    bottom: 0;
+    right: 0;
+    left: auto;
+    width: 120px;
+    height: 100vh;
+    background: linear-gradient(to left, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  }
+}
+
+/* Badge trạng thái nhỏ gọn lại để không vướng tầm nhìn */
+.status-badge {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  z-index: 10;
+  white-space: nowrap;
+}

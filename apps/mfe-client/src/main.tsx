@@ -25,9 +25,9 @@ class AirDeviceElement extends HTMLElement {
     // 4. Render React App
     const root = createRoot(mountPoint);
     root.render(
-      <React.StrictMode>
+      // <React.StrictMode>
         <App />
-      </React.StrictMode>
+      // </React.StrictMode>
     );
   }
 }
