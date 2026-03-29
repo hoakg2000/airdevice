@@ -47,13 +47,15 @@ export const App: React.FC = () => {
     const startCamera = async (webrtcPeer: AirDevicePeer) => {
       try {
         localStream = await navigator.mediaDevices.getUserMedia({
-          video: {
+          video: { 
             facingMode: 'environment',
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
-            frameRate: { ideal: 30 },
+            // width: { ideal: 1920 },
+            // height: { ideal: 1080 },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 30 } 
           },
-          audio: false,
+          audio: false
         });
 
         // Báo cho thuật toán biết đây là tài liệu (giữ nét chữ)

@@ -12,6 +12,14 @@
 - [Phase 8: WebRTC Core (Tầng Giao thức P2P)](#phase-8-webrtc-core-tầng-giao-thức-p2p)
 - [Phase 9: Mobile Media Capture (Tầng Ngoại vi)](#phase-9-mobile-media-capture-tầng-ngoại-vi)
 - [Phase 10: MFE Media Render & Host API (Tầng Tích hợp)](#phase-10-mfe-media-render--host-api-tầng-tích-hợp)
+- [Phase 11: UI/UX Refinement & Cross-Device Sync (Tối ưu Trải nghiệm)](#phase-11-uiux-refinement--cross-device-sync-tối-ưu-trải-nghiệm)
+- [Phase 12: Quality Assurance (Đảm bảo Chất lượng Code)](#phase-12-quality-assurance-đảm-bảo-chất-lượng-code)
+- [Phase 13: Architectural Split & Demo Hub (Phân rã Kiến trúc & Demo)](#phase-13-architectural-split--demo-hub-phân-rã-kiến-trúc--demo)
+- [Phase 14: Snapshot Backend Extension (Hạ tầng Lưu trữ API)](#phase-14-snapshot-backend-extension-hạ-tầng-lưu-trữ-api)
+- [Phase 15: Snapshot Dual-Mode Implementation (Thực thi Chế độ Chụp tĩnh)](#phase-15-snapshot-dual-mode-implementation-thực-thi-chế-độ-chụp-tĩnh)
+- [Phase 16: Containerization & DevOps (Đóng gói Triển khai)](#phase-16-containerization--devops-đóng-gói-triển-khai)
+- [Phase 17: The Open Source Standard (Tài liệu & Usecase)](#phase-17-the-open-source-standard-tài-liệu--usecase)
+- [Phase 18: The Future Roadmap (Tầm nhìn Mở rộng)](#phase-18-the-future-roadmap-tầm-nhìn-mở-rộng)
 
 ---
 
@@ -92,31 +100,53 @@
 - Unit Test (Frontend): Dùng Vitest và React Testing Library để test các component thuần (ví dụ: test UI render đúng QR code khi có session, test nút bấm gọi đúng hàm).
 - (Bổ sung) Linter & Formatter: Cấu hình ESLint và Prettier chạy trên toàn bộ Monorepo để đảm bảo code style đồng nhất (rất quan trọng cho Open Source).
 
-## Phase 13: Containerization & DevOps (Đóng gói Triển khai)
+## Phase 13: Architectural Split & Demo Hub (Phân rã Kiến trúc & Demo)
 
-- Mục tiêu: Bất kỳ ai clone project về cũng có thể chạy lên bằng 1 câu lệnh duy nhất.
-- Docker Multi-stage Builds: Viết Dockerfile tối ưu dung lượng cho từng service:
-  - signaling-server: Build Node.js image gọn nhẹ (Alpine).
-  - mfe-client & mobile-client: Build ra static files và dùng Nginx alpine để serve.
-- Docker Compose: Cập nhật file docker-compose.yml hiện tại (đang có Redis) để chạy đồng loạt cả 4 container: Redis, Signaling, MFE, Mobile. Setup Network và Environment Variables chuẩn xác.
+- Mục tiêu: Tái cấu trúc MFE thành thư viện lõi hỗ trợ đa chế độ (Dual-Mode), tạo Host App chuyên dụng để chạy thử nghiệm, và thiết lập định tuyến cho Mobile.
+- Khởi tạo `apps/demo`: Tạo một project Vite/React mới đóng vai trò làm Host App. Import file `air-device.js` từ MFE. Xây dựng giao diện layout 2 cột để demo song song: `<air-device mode="live" />` và `<air-device mode="snapshot" />`.
+- Refactor MFE Client: Bổ sung props `mode` vào Web Component. Dựa vào props này, mã QR sinh ra sẽ đính kèm thêm tham số phân luồng. VD: `?sessionId=xyz&mode=snapshot`.
+- Thiết lập Mobile Client Router: Cấu hình React Router (hoặc đọc URL Search Params `?mode=`) bên trong `apps/mobile-client`. Tách UI thành 2 View Component riêng biệt: `LiveView` và `SnapshotView`. Sử dụng kỹ thuật Lazy Loading (`React.lazy`) để đảm bảo không tải code WebRTC khi user đang ở chế độ Snapshot.
 
-## Phase 14: The Open Source Standard (Tài liệu & Usecase)
+## Phase 14: Snapshot Backend Extension (Hạ tầng Lưu trữ API)
 
-- Mục tiêu: Làm cho repo GitHub của bạn trông "đắt tiền" và chuyên nghiệp nhất.
+- Mục tiêu: Nâng cấp NestJS Server để vừa đóng vai trò làm WebRTC Signaling, vừa làm File Server xử lý luồng ảnh tải lên.
+- Thiết lập Storage: Cấu hình thư mục chứa ảnh tạm thời trên NestJS (ví dụ: `uploads/`).
+- REST API: Viết endpoint `POST /api/upload` sử dụng thư viện `Multer` để nhận file ảnh (`multipart/form-data`) từ Mobile Client.
+- Cross-Device Event: Ngay khi ảnh lưu thành công, NestJS sẽ lấy URL của ảnh và bắn một sự kiện WebSocket `SNAPSHOT_RECEIVED` kèm URL đó vào Room của `sessionId`.
+- Static Serving: Cấu hình NestJS để serve các file ảnh tĩnh này (VD: `GET /uploads/image-123.jpg`) để Desktop có thể lấy ảnh về hiển thị.
+
+## Phase 15: Snapshot Dual-Mode Implementation (Thực thi Chế độ Chụp tĩnh)
+
+- Mục tiêu: Hoàn thiện luồng UX siêu nhẹ và ổn định cho nhánh Snapshot mà không cần đến WebRTC.
+- Giao diện Mobile (`SnapshotView`): Không gọi `getUserMedia` hay xin quyền rườm rà. Hiển thị một nút bấm to để gọi thẻ ẩn `<input type="file" accept="image/*" capture="environment" />` (kích hoạt ứng dụng Camera Native của điện thoại).
+- Logic Mobile: Không khởi tạo WebRTC. Khi user chụp xong, dùng `Axios` gửi thẳng file ảnh kèm theo `sessionId` lên API `POST /api/upload` của NestJS và hiển thị thông báo "Đã gửi thành công ✅".
+- Logic MFE Desktop: Lắng nghe event `SNAPSHOT_RECEIVED` từ WebSocket. Nếu nhận được URL ảnh, lập tức ẩn màn hình chờ QR Code và hiển thị thẻ `<img src={url} />` chứa bức ảnh vừa chụp.
+
+## Phase 16: Containerization & DevOps (Đóng gói Triển khai)
+
+- Mục tiêu: Bất kỳ ai clone project về cũng có thể chạy lên toàn bộ hệ sinh thái bằng 1 câu lệnh duy nhất.
+- Docker Multi-stage Builds: Viết Dockerfile tối ưu dung lượng (Alpine) cho từng service độc lập:
+  - `signaling-server` (Backend Node.js).
+  - `demo` (Nginx serve Host App đã nhúng sẵn MFE).
+  - `mobile-client` (Nginx serve PWA đa luồng).
+- Docker Compose: Cấu hình file `docker-compose.yml` để chạy đồng loạt 4 container: Redis, Signaling, Demo, Mobile. Setup Network, Port Mapping và Mount Volume cho thư mục `uploads/` của NestJS để không làm mất ảnh khi sập container.
+
+## Phase 17: The Open Source Standard (Tài liệu & Usecase)
+
+- Mục tiêu: Làm cho repo GitHub của bạn trông "đắt tiền" và chuyên nghiệp nhất, nhấn mạnh vào kiến trúc Dual-Mode.
 - Global README.md:
   - Gắn Badges (Build status, License, Version).
-  - Sơ đồ Kiến trúc (Architecture Diagram - Lấy từ các sơ đồ Mermaid chúng ta đã vẽ).
-  - Hướng dẫn Quick Start (chạy bằng Docker).
-- Usecases (Ứng dụng thực tế): Liệt kê rõ project này có thể nhúng vào đâu:
-  - eKYC Document Scanner: Dùng mobile chụp giấy tờ cho hệ thống web ngân hàng.
-  - Remote Webcam: Biến điện thoại thành webcam không dây cho PC (như Apple Continuity Camera).
-  - IoT Surveillance: Gắn điện thoại cũ ở nhà làm camera an ninh, xem trực tiếp trên trình duyệt công ty.
-- Service Docs: Viết file README.md ngắn gọn trong từng thư mục apps/ giải thích vai trò và cách chạy Dev mode của service đó.
+  - Sơ đồ Kiến trúc (Architecture Diagram - Cập nhật sơ đồ thể hiện luồng LiveStream vs Snapshot).
+  - Hướng dẫn Quick Start (chạy bằng Docker Compose).
+- Usecases (Phân tích Trade-off): Giải thích kỹ thuật tại sao dự án tách 2 mode:
+  - eKYC / Document Scanner: Khuyên dùng Snapshot Mode (độ nét cao, không ngốn pin, dễ bypass quyền lợi).
+  - Remote Webcam / IoT Surveillance: Khuyên dùng LiveStream Mode (độ trễ thấp, quan sát thời gian thực).
+- Service Docs: Viết file README.md ngắn gọn trong từng thư mục `apps/` giải thích vai trò của service đó.
 
-## Phase 15: The Future Roadmap (Tầm nhìn Mở rộng)
+## Phase 18: The Future Roadmap (Tầm nhìn Mở rộng)
 
-- Mục tiêu: Đặt ra định hướng tương lai, thể hiện bạn hiểu sâu về tiềm năng của WebRTC.
-- Tính năng bổ sung (Ghi vào Roadmap hoặc làm sau cùng):
-  - WebRTC DataChannels: Mở kênh truyền text siêu tốc P2P (bỏ qua NestJS) để truyền lệnh "Bật Flash", "Đổi Camera Trước/Sau" từ Desktop xuống Mobile độ trễ 0ms.
-  - Two-way Audio (Walkie-Talkie): Xin quyền audio: true, truyền luồng âm thanh hai chiều giữa Mobile và Desktop.
-  - Remote Video Recording: Sử dụng API MediaRecorder trên MFE Desktop để quay lại luồng WebRTC thành file .webm hoặc .mp4 và tải xuống.
+- Mục tiêu: Đặt ra định hướng tương lai, thể hiện bạn hiểu sâu về tiềm năng mở rộng của WebRTC và AI.
+- Tính năng bổ sung (Ghi vào Roadmap):
+  - WebRTC DataChannels: Mở kênh truyền text siêu tốc P2P để điều khiển phần cứng (Bật Flash, Đổi Camera).
+  - Two-way Audio (Walkie-Talkie): Truyền luồng âm thanh hai chiều giữa Mobile và Desktop.
+  - Tích hợp AI (Client-side): Chạy mô hình TensorFlow.js trên MFE để xóa phông nền hoặc OCR nhận diện chữ trên CMND.

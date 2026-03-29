@@ -95,31 +95,29 @@ export class AirDevicePeer {
   // Tiêm luồng Camera vào Peer
   public addLocalStream(stream: MediaStream) {
     stream.getTracks().forEach((track) => {
-      if (track.kind === 'video' && 'contentHint' in track) {
-        track.contentHint = 'detail';
-      }
+      // Bỏ contentHint 'detail' nếu bạn muốn ưu tiên độ mượt hơn độ sắc nét của chữ
+      // Nếu vẫn muốn quét chữ, hãy giữ lại. Ở đây tôi comment lại để ưu tiên chống lag tuyệt đối.
+      // if (track.kind === 'video' && 'contentHint' in track) {
+      //   track.contentHint = 'detail';
+      // }
 
       const sender = this.pc.addTrack(track, stream);
 
-      // Chỉ can thiệp vào luồng Video
       if (track.kind === 'video') {
         const parameters = sender.getParameters();
-
         if (!parameters.encodings) {
           parameters.encodings = [{}];
         }
 
-        // Hạ từ 3000000 xuống 1500000 (1.5 Mbps)
+        // Bỏ giới hạn maxBitrate để WebRTC tự bơm băng thông khi mạng khỏe
         parameters.encodings[0].maxBitrate = 1500000;
 
-        // 2. Tắt tính năng tự động hạ độ phân giải (Scale down)
-        // Lưu ý: Có thể báo lỗi đỏ ở TypeScript vì thuộc tính này khá mới,
-        // bạn có thể phớt lờ lỗi type hoặc dùng @ts-ignore
+        // CHIẾN THUẬT MỚI: Ưu tiên giữ khung hình (FPS) tuyệt đối.
+        // Trình duyệt sẽ hy sinh độ nét (làm mờ đi 1 chút) khi mạng yếu để đảm bảo không bị giật lag.
         // @ts-ignore
-        parameters.degradationPreference = 'maintain-resolution';
+        parameters.degradationPreference = 'maintain-framerate';
 
-        // Áp dụng thông số mới
-        sender.setParameters(parameters).catch((e) => {
+        sender.setParameters(parameters).catch(e => {
           console.warn('Trình duyệt không hỗ trợ ép parameters:', e);
         });
       }
