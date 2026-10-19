@@ -1,15 +1,15 @@
 air-device/
 ├── apps/
-│ ├── signaling-server/ # NestJS Backend: Quản lý Session, WebSocket Gateway, WebRTC Signaling
-│ ├── mfe-client/ # React MFE: Bundle thành 1 file .js duy nhất, dùng Shadow DOM
-│ └── mobile-client/ # React PWA: UI trên điện thoại, truy cập Camera/Mic (MediaRecorder)
+│ ├── signaling-server/ # NestJS: sessions, WebRTC signaling relay, serves the phone page at /m/
+│ └── mobile-client/ # React phone page: camera, torch, switch camera, photo over DataChannel
 ├── packages/
-│ ├── shared-types/ # TypeScript Interfaces, Zod Schemas hoặc Protobuf defs (AI-Ready)
-│ ├── webrtc-core/ # Xử lý logic WebRTC, SDP negotiation, STUN/TURN configs chung
-│ └── config/ # ESLint, Prettier, TSConfig base dùng chung cho toàn monorepo
+│ ├── element/ # <air-device> web component (npm: @air-device/element)
+│ ├── client/ # Headless SDK: AirDevicePeer, HostSession, CameraSession (npm: @air-device/client)
+│ ├── protocol/ # Zod schemas + types (npm: @air-device/protocol)
+│ └── config/ # Shared tsconfig
 ├── docker/
-│ ├── docker-compose.yml # Cấu hình Local dev (Redis, Backend, Traefik/Nginx)
-│ ├── redis/ # Custom redis.conf (tối ưu memory eviction)
-│ └── turn-server/ # Cấu hình Coturn (nếu tự host STUN/TURN)
+│ ├── docker-compose.yml # Server + optional Redis
+│ └── redis/ # redis.conf
+├── Dockerfile # Server + phone page image
 ├── package.json # Workspace config
-└── pnpm-workspace.yaml # Pnpm workspace definition
+└── pnpm-workspace.yaml # pnpm workspace definition
