@@ -1,19 +1,26 @@
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
-import { RedisIoAdapter } from './redis-io.adapter';
+import { AppIoAdapter } from './io.adapter';
+import { config } from './config';
 
 async function bootstrap() {
-  // Sử dụng Fastify thay vì Express mặc định
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
-  // Gắn Redis Adapter vào Lifecycle của NestJS
-  const redisIoAdapter = new RedisIoAdapter(app);
-  await redisIoAdapter.connectToRedis();
-  app.useWebSocketAdapter(redisIoAdapter);
+  const ioAdapter = new AppIoAdapter(app);
+  if (config.redisUrl) await ioAdapter.connectToRedis(config.redisUrl);
+  app.useWebSocketAdapter(ioAdapter);
 
-  // Khởi chạy server ở port 3000, lắng nghe trên 0.0.0.0 để Docker/LAN có thể truy cập
-  await app.listen(3000, '0.0.0.0');
-  console.log(`🚀 Signaling Server is running on: ${await app.getUrl()}`);
+  // Serve the phone page from the same origin so it can reach the socket at '/'
+  if (config.mobileDir) {
+    const root = resolve(config.mobileDir);
+    if (!existsSync(root)) throw new Error(`MOBILE_DIR not found: ${root}`);
+    app.useStaticAssets({ root, prefix: '/m/' });
+  }
+
+  await app.listen(config.port, config.host);
+  console.log(`AirDevice signaling server listening on ${await app.getUrl()}`);
 }
 bootstrap();
