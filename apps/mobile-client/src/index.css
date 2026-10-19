@@ -32,8 +32,11 @@ body {
   border: 2px dashed #4f46e5;
   padding: 2rem;
   border-radius: 16px;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  width: min(90vw, 360px);
+  line-height: 1.5;
+  z-index: 20;
 }
 
 .local-video {
@@ -47,12 +50,6 @@ body {
   background-color: #111;
 }
 
-.overlay {
-  /* ... Giữ nguyên ... */
-  background: rgba(0, 0, 0, 0.7); /* Làm nền mờ tối hơn chút để dễ đọc chữ trên nền video */
-  backdrop-filter: blur(8px);
-}
-
 .camera-controls {
   position: absolute;
   bottom: 0;
@@ -61,7 +58,7 @@ body {
   height: 120px;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   z-index: 10;
   transition: all 0.3s ease;
@@ -107,6 +104,7 @@ body {
     width: 120px;
     height: 100vh;
     background: linear-gradient(to left, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    flex-direction: column;
   }
 }
 
@@ -124,4 +122,37 @@ body {
   font-size: 0.85rem;
   z-index: 10;
   white-space: nowrap;
+}
+
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 1.4rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.icon-btn:disabled {
+  opacity: 0.3;
+}
+
+.capture-btn-mobile:focus-visible,
+.icon-btn:focus-visible {
+  outline: 3px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+.toast {
+  position: absolute;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(16, 185, 129, 0.9);
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  z-index: 20;
 }

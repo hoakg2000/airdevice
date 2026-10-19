@@ -1,0 +1,64 @@
+{
+  "name": "@air-device/element",
+  "version": "0.1.0",
+  "description": "<air-device> web component: pair a phone camera with any web page via QR code and WebRTC.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./cdn": "./dist/air-device.iife.js"
+  },
+  "unpkg": "./dist/air-device.iife.js",
+  "jsdelivr": "./dist/air-device.iife.js",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": true,
+  "keywords": [
+    "web-component",
+    "webrtc",
+    "camera",
+    "qr-code",
+    "remote-camera",
+    "ekyc",
+    "document-scanner"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoakg2000/airdevice.git",
+    "directory": "packages/element"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && vite build --mode cdn && tsc -p tsconfig.build.json",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@air-device/client": "workspace:^",
+    "qrcode.react": "^4.2.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "jsdom": "^29.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0",
+    "vitest": "^2.1.9"
+  }
+}

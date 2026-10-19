@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AirDevice dev demo</title>
+    <style>
+      body { background: #f0f2f5; font-family: system-ui, sans-serif; padding: 2rem; }
+      .container { display: flex; flex-wrap: wrap; gap: 2rem; max-width: 1200px; margin: 0 auto; }
+      .panel { flex: 1 1 400px; }
+      #result { max-width: 100%; border-radius: 8px; border: 2px solid #10b981; display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="panel">
+        <air-device server-url="http://localhost:3000" mobile-url="%VITE_MOBILE_URL%"></air-device>
+      </div>
+      <div class="panel">
+        <h3>Captured photo</h3>
+        <p id="meta"></p>
+        <img id="result" alt="Captured photo" />
+      </div>
+    </div>
+
+    <script type="module" src="/src/index.ts"></script>
+    <script>
+      document.querySelector('air-device').addEventListener('capture', (event) => {
+        const { photo, source } = event.detail;
+        const img = document.getElementById('result');
+        URL.revokeObjectURL(img.src);
+        img.src = URL.createObjectURL(photo);
+        img.style.display = 'block';
+        document.getElementById('meta').textContent =
+          `${Math.round(photo.size / 1024)} KB · ${photo.type} · source: ${source}`;
+      });
+    </script>
+  </body>
+</html>

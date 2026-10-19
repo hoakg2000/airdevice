@@ -1,0 +1,203 @@
+/* Theme hooks: override from the host page, e.g. air-device { --air-device-accent: #0ea5e9; } */
+:host {
+  --air-device-accent: #4f46e5;
+  --air-device-accent-hover: #4338ca;
+  --air-device-bg: #ffffff;
+  --air-device-surface: #f9fafb;
+  --air-device-border: #e5e7eb;
+  --air-device-text: #111827;
+  --air-device-muted: #6b7280;
+  --air-device-radius: 12px;
+  --air-device-font: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --air-device-video-height: 350px;
+  display: block;
+}
+
+.air-device-host {
+  font-family: var(--air-device-font);
+  color: var(--air-device-text);
+  background: var(--air-device-bg);
+  border: 1px solid var(--air-device-border);
+  border-radius: var(--air-device-radius);
+  padding: 24px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.status {
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+}
+
+.status p {
+  margin: 0 0 12px;
+}
+
+.notice {
+  color: var(--air-device-muted);
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+
+.qr-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: var(--air-device-surface);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px dashed var(--air-device-border);
+}
+
+.qr-box {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  line-height: 0;
+}
+
+.qr-box.expired {
+  opacity: 0.2;
+}
+
+.qr-steps {
+  flex: 1;
+  padding-left: 20px;
+  margin: 0;
+  color: var(--air-device-muted);
+  line-height: 1.6;
+}
+
+.qr-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--air-device-muted);
+}
+
+@media (max-width: 420px) {
+  .qr-container {
+    flex-direction: column;
+  }
+}
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--air-device-accent);
+  background: var(--air-device-accent);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--air-device-accent-hover);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--air-device-accent);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--air-device-accent);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--air-device-surface);
+}
+
+.capture-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+}
+
+.capture-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  height: var(--air-device-video-height);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-placeholder {
+  position: absolute;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+/* contain (not cover) so no corner of the document is cropped */
+.remote-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.flash-effect {
+  position: absolute;
+  inset: 0;
+  background-color: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.flash-effect.active {
+  animation: flash 0.3s ease-out;
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes flash {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash-effect.active,
+  .pulse {
+    animation: none;
+  }
+}

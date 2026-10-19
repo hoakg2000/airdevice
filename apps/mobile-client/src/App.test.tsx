@@ -1,37 +1,29 @@
-// apps/mobile-client/src/App.test.tsx
 import { render, screen } from '@testing-library/react';
-import { App } from './App';
 import { vi } from 'vitest';
+import { App } from './App';
 
-// Mock Socket.io
-vi.mock('socket.io-client', () => ({
-  io: vi.fn(() => ({
-    on: vi.fn(),
-    emit: vi.fn(),
-    disconnect: vi.fn(),
-  })),
+vi.mock('@air-device/client', async (importOriginal) => ({
+  // keep the real hash parser, fake the network session
+  parsePairingHash: (await importOriginal<typeof import('@air-device/client')>()).parsePairingHash,
+  CameraSession: vi.fn().mockImplementation(() => ({ start: vi.fn(), destroy: vi.fn() })),
 }));
 
-// Mock WebRTC Core
-vi.mock('@air-device/webrtc-core', () => ({
-  AirDevicePeer: vi.fn().mockImplementation(() => ({
-    destroy: vi.fn(),
-    addLocalStream: vi.fn(),
-  })),
-}));
+const setHash = (hash: string) => {
+  window.history.replaceState(null, '', `/${hash}`);
+};
 
-describe('Mobile Client App', () => {
-  it('Hiển thị lỗi nếu truy cập mà không có Session ID trên URL', () => {
-    // Giả lập URL hiện tại không có query param `?sessionId=...`
-    Object.defineProperty(window, 'location', {
-      value: { search: '' },
-      writable: true,
-    });
-
+describe('Mobile camera page', () => {
+  it('shows an error when the link has no pairing info', () => {
+    setHash('');
     render(<App />);
-    
-    // Tìm thẻ chứa text thông báo lỗi
-    const errorMsg = screen.getByText(/Lỗi: Không tìm thấy Session ID/i);
-    expect(errorMsg).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Invalid link');
+  });
+
+  it('explains how to fix a blocked camera permission', async () => {
+    setHash('#s=abc&t=token');
+    const denied = Object.assign(new Error('no'), { name: 'NotAllowedError' });
+    vi.spyOn(navigator.mediaDevices, 'getUserMedia').mockRejectedValue(denied);
+    render(<App />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Camera access was blocked');
   });
 });
